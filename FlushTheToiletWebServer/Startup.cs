@@ -61,6 +61,10 @@ namespace FlushTheToiletWebServer
             }
 
             app.UseMvc();
+
+            // start state machine
+            var stateMachine = app.ApplicationServices.GetService<IToiletFlusherStateMachineModel>();
+            stateMachine.StartToiletStateMachine();
         }
 
         private void RegisterCf01Modules(IServiceCollection services)
