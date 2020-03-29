@@ -1,1 +1,1 @@
-powershell -command "C:\startup.ps1"
+powershell -command "C:\startup.ps1

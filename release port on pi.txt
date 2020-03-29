@@ -1,7 +1,4 @@
 ﻿netsh advfirewall firewall add rule name=”ASP.NET Core Web Server port” dir=in action=allow protocol=TCP localport=5000
 
 
-;schtasks /create /tn "StartupScript" /tr c:\startup.bat /sc onstart /ru SYSTEM
-schtasks /Create /RU administrator /RP ***** /SC ONSTART /TN "StartupScript" /TR "c:\startup.bat"
-
-schtasks /Delete /TN "MyStartupScript" /F
+schtasks /create /tn "MyStartupScript" /tr c:\startup.bat /sc onstart /ru SYSTEM

@@ -28,8 +28,8 @@ namespace FlushTheToiletWebServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(option => option.EnableEndpointRouting = false);
-            
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
             RegisterCf01Modules(services);
             RegisterServices(services);
             RegisterModels(services);
@@ -43,7 +43,7 @@ namespace FlushTheToiletWebServer
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
@@ -55,10 +55,10 @@ namespace FlushTheToiletWebServer
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Flush The Toilet Api V1");
             });
 
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseDeveloperExceptionPage();
-            //}
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
 
             app.UseMvc();
         }
