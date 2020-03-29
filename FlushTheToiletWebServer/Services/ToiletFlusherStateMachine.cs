@@ -27,8 +27,6 @@ namespace FlushTheToiletWebServer.Services
             mManDetection.SomeoneDetectedChanged += SomeoneDetectedChangedHandler;
             mManDetection.SomeoneIsPeeingChanged += SomeoneIsPeeingChangedHandler;
             ConfigureStateMachine();
-
-            StartToiletStateMachine();
         }
 
         public ToiletStateMachineStatus GetStatus()
