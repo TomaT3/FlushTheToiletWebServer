@@ -1,6 +1,7 @@
 ﻿using FlushTheToiletWebServer.CF01.Devices;
 using System;
 using System.Collections.Generic;
+using System.Device.Gpio;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -10,12 +11,15 @@ namespace FlushTheToiletWebServer.CF01
 {
     public class LedControl : ILedControl
     {
-        Led mRedLed = new Led(PinAssignment.RED_LED);
-        Led mYellowLed = new Led(PinAssignment.YELLOW_LED);
-        Led mGreenLed = new Led(PinAssignment.GREEN_LED);
+        readonly Led mRedLed;
+        readonly Led mYellowLed;
+        readonly Led mGreenLed;
 
-        public LedControl()
+        public LedControl(IGpioController gpio)
         {
+            mRedLed = new Led(gpio, PinAssignment.RED_LED);
+            mYellowLed = new Led(gpio, PinAssignment.YELLOW_LED);
+            mGreenLed = new Led(gpio, PinAssignment.GREEN_LED);
             TurnAllLedsOn();
             Thread.Sleep(500);
             TurnAllLedsOff();

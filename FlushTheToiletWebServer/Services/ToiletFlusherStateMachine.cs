@@ -1,12 +1,15 @@
-﻿using Appccelerate.StateMachine;
+﻿using System;
+using Appccelerate.StateMachine;
 using Appccelerate.StateMachine.Extensions;
 using Appccelerate.StateMachine.Machine;
 using FlushTheToiletWebServer.CF01;
+using ioBroker.net;
 
 namespace FlushTheToiletWebServer.Services
 {
     public class ToiletFlusherStateMachine : IToiletFlusherStateMachine
     {
+        private readonly IIoBrokerDotNet _ioBroker;
         private PassiveStateMachine<ToiletStates, ToiletEvents> mToiletStateMachine;
         private CurrentStateExtension mCurrentStateExtension;
         private IFlushService mFlusherMotor;
@@ -18,8 +21,10 @@ namespace FlushTheToiletWebServer.Services
         public ToiletFlusherStateMachine(
             IFlushService flusherMotor,
             IManDetectionService manDetection,
-            ILedControl ledControl)
+            ILedControl ledControl,
+            IIoBrokerDotNet ioBroker)
         {
+            _ioBroker = ioBroker;
             mFlusherMotor = flusherMotor;
             mManDetection = manDetection;
             mLedControl = ledControl;
@@ -27,6 +32,7 @@ namespace FlushTheToiletWebServer.Services
             mManDetection.SomeoneDetectedChanged += SomeoneDetectedChangedHandler;
             mManDetection.SomeoneIsPeeingChanged += SomeoneIsPeeingChangedHandler;
             ConfigureStateMachine();
+            _ioBroker.ConnectAsync(TimeSpan.FromSeconds(5));
         }
 
         public ToiletStateMachineStatus GetStatus()
@@ -41,6 +47,7 @@ namespace FlushTheToiletWebServer.Services
         {
             if (!mStateMachineIsRunning)
             {
+                ResetTempFlushCount();
                 mStateMachineIsRunning = true;
                 mToiletStateMachine.Fire(ToiletEvents.StartStateMachine);
                 mManDetection.StartManDetection();
@@ -133,7 +140,25 @@ namespace FlushTheToiletWebServer.Services
             mLedControl.YellowLedOff();
             mLedControl.RedLedOn();
             mFlusherMotor.Flush();
+            SetFlushCountInIoBroker();
             mToiletStateMachine.Fire(ToiletEvents.FlushFinished);
+        }
+
+        private void ResetTempFlushCount()
+        {
+            var tempCountId = "javascript.0.toilet.flushes.count";
+            _ioBroker.SetStateAsync<int>(tempCountId, 0);
+        }
+
+        private void SetFlushCountInIoBroker()
+        {
+            var tempCountId = "javascript.0.toilet.flushes.count";
+            var tempCount = _ioBroker.GetStateAsync<int>(tempCountId, TimeSpan.FromSeconds(5)).Result;
+            _ioBroker.SetStateAsync<int>(tempCountId, ++tempCount);
+
+            var totalCountId = "javascript.0.toilet.flushes.totalcount";
+            var totalCount = _ioBroker.GetStateAsync<int>(totalCountId, TimeSpan.FromSeconds(5)).Result;
+            _ioBroker.SetStateAsync<int>(totalCountId, ++totalCount);
         }
     }
 

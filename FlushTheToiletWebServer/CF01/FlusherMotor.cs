@@ -1,4 +1,5 @@
-﻿using FlushTheToiletWebServer.CF01.Devices;
+﻿using System.Device.Gpio;
+using FlushTheToiletWebServer.CF01.Devices;
 using System.Threading;
 
 namespace FlushTheToiletWebServer.CF01
@@ -10,9 +11,9 @@ namespace FlushTheToiletWebServer.CF01
 
         private Motor mFlushMotor;
         
-        public FlusherMotor()
+        public FlusherMotor(IGpioController gpio)
         {
-            mFlushMotor = new Motor(FLUSH_OUTPUT, STOP_FLUSH_OUTPUT);
+            mFlushMotor = new Motor(gpio, FLUSH_OUTPUT, STOP_FLUSH_OUTPUT);
         }
 
         public void Forward()

@@ -4,11 +4,11 @@ using System.Device.Gpio;
 
 namespace FlushTheToiletWebServer.CF01.Devices
 {
-    public class Led:  IDisposable  {
+    public class Led:  IDisposable
+    {
+        private readonly IGpioController _gpio;
 
-        GpioController gpio = new GpioController();
-
-        LedState ts = new LedState();
+        LedState _ts = new LedState();
 
         class LedState {
             public uint blinkMilliseconds = 0;
@@ -32,47 +32,49 @@ namespace FlushTheToiletWebServer.CF01.Devices
         /// </summary>
         /// <param name="pin">From the SecretLabs.NETMF.Hardware.NetduinoPlus.Pins namespace</param>
         /// <param name="name">Unique identifying name for command and control</param>
-        public Led(int pinNumber) {
+        public Led(IGpioController gpio, int pinNumber) 
+        {
+            _gpio = gpio;
             InitLed(pinNumber);
         }
 
         private void InitLed(int pinNumber) {
-            ts.pinNumber = pinNumber;
-            gpio.OpenPin(ts.pinNumber, PinMode.Output);
-            gpio.Write(ts.pinNumber, PinValue.Low);
+            _ts.pinNumber = pinNumber;
+            _gpio.OpenPin(_ts.pinNumber, PinMode.Output);
+            _gpio.Write(_ts.pinNumber, PinValue.Low);
 
-            ts.tmr = new Timer(BlinkTime_Tick, ts, Timeout.Infinite, Timeout.Infinite);
+            _ts.tmr = new Timer(BlinkTime_Tick, _ts, Timeout.Infinite, Timeout.Infinite);
         }
 
 
         public void On() {
-            if (ts.running) { return; }
-            gpio.Write(ts.pinNumber, PinValue.High);
+            if (_ts.running) { return; }
+            _gpio.Write(_ts.pinNumber, PinValue.High);
         }
 
         public void Off() {
-            if (ts.running) { return; }
-            gpio.Write(ts.pinNumber, PinValue.Low);
+            if (_ts.running) { return; }
+            _gpio.Write(_ts.pinNumber, PinValue.Low);
         }
 
         public void BlinkOn(uint Milliseconds, BlinkRate blinkRate) {
 
-            if (ts.running) { return; }
-            ts.running = true;
+            if (_ts.running) { return; }
+            _ts.running = true;
 
-            ts.blinkMilliseconds = Milliseconds;
-            ts.BlinkMillisecondsToDate = 0;
-            ts.blinkRateMilliseconds = (int)blinkRate;
-            ts.tmr.Change(0, ts.blinkRateMilliseconds);
+            _ts.blinkMilliseconds = Milliseconds;
+            _ts.BlinkMillisecondsToDate = 0;
+            _ts.blinkRateMilliseconds = (int)blinkRate;
+            _ts.tmr.Change(0, _ts.blinkRateMilliseconds);
         }
 
         void BlinkTime_Tick(object state) {
             var ts = (LedState)state;
 
             if (!ts.ledOn)
-                gpio.Write(ts.pinNumber, PinValue.High);
+                _gpio.Write(ts.pinNumber, PinValue.High);
             else
-                gpio.Write(ts.pinNumber, PinValue.Low);
+                _gpio.Write(ts.pinNumber, PinValue.Low);
 
             ts.ledOn = !ts.ledOn;
 
@@ -80,13 +82,13 @@ namespace FlushTheToiletWebServer.CF01.Devices
             if (ts.BlinkMillisecondsToDate >= ts.blinkMilliseconds) {
                 // turn off blink
                 ts.tmr.Change(Timeout.Infinite, Timeout.Infinite);
-                gpio.Write(ts.pinNumber, PinValue.Low);
+                _gpio.Write(ts.pinNumber, PinValue.Low);
                 ts.running = false;
             }
         }
 
         public void Dispose() {
-            gpio.Dispose();
+            _gpio.Dispose();
         }
     }
 }

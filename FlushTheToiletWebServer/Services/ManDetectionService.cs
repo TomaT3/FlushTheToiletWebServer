@@ -13,6 +13,8 @@ namespace FlushTheToiletWebServer.Services
         private const int PEEING_DETECTION_TIME = 5000;
         private const int NO_ONE_THERE_TIME = 2000;
 
+        private bool boolforTest = false;
+
         private bool mStopManDetection;
         private Timer mTimer;
         private IManDetectionDistanceSensor mDistanceSensor;
@@ -116,8 +118,10 @@ namespace FlushTheToiletWebServer.Services
             }
 
             Distance = mDistanceSensor.GetDistance();
+            
 
-            if (Distance > mMinDistance && Distance < mMaxDistance)
+            if ((Distance > mMinDistance && Distance < mMaxDistance) 
+                || boolforTest)
             {
                 SomeoneDetected = true;
                 mTimer.Change(TimeSpan.FromMilliseconds(MEASURE_INTERVAL_TIME_WHEN_MAN_DETECTED), Timeout.InfiniteTimeSpan);
