@@ -32,7 +32,6 @@ namespace FlushTheToiletWebServer.Services
             mManDetection.SomeoneDetectedChanged += SomeoneDetectedChangedHandler;
             mManDetection.SomeoneIsPeeingChanged += SomeoneIsPeeingChangedHandler;
             ConfigureStateMachine();
-            _ioBroker.ConnectAsync(TimeSpan.FromSeconds(5));
         }
 
         public ToiletStateMachineStatus GetStatus()
@@ -152,13 +151,28 @@ namespace FlushTheToiletWebServer.Services
 
         private void SetFlushCountInIoBroker()
         {
-            var tempCountId = "javascript.0.toilet.flushes.count";
-            var tempCount = _ioBroker.GetStateAsync<int>(tempCountId, TimeSpan.FromSeconds(5)).Result;
-            _ioBroker.SetStateAsync<int>(tempCountId, ++tempCount);
+            try
+            {
+                var tempCountId = "javascript.0.toilet.flushes.count";
+                var tempCountResult = _ioBroker.GetStateAsync<int>(tempCountId, TimeSpan.FromSeconds(5)).Result;
+                if (tempCountResult.Success)
+                {
+                    var newValue = tempCountResult.Value + 1;
+                    _ioBroker.SetStateAsync<int>(tempCountId, newValue);
+                }
 
-            var totalCountId = "javascript.0.toilet.flushes.totalcount";
-            var totalCount = _ioBroker.GetStateAsync<int>(totalCountId, TimeSpan.FromSeconds(5)).Result;
-            _ioBroker.SetStateAsync<int>(totalCountId, ++totalCount);
+                var totalCountId = "javascript.0.toilet.flushes.totalcount";
+                var totalCountResult = _ioBroker.GetStateAsync<int>(totalCountId, TimeSpan.FromSeconds(5)).Result;
+                if (totalCountResult.Success)
+                {
+                    var newValue = totalCountResult.Value + 1;
+                    _ioBroker.SetStateAsync<int>(totalCountId, newValue);
+                }
+            }
+            catch
+            {
+                // just continue
+            }
         }
     }
 

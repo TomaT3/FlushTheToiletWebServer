@@ -42,6 +42,8 @@ namespace FlushTheToiletWebServer
             RegisterServices(services);
             RegisterModels(services);
 
+            services.AddHostedService<StartupService>();
+
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
@@ -74,10 +76,6 @@ namespace FlushTheToiletWebServer
             {
                 endpoints.MapControllers();
             });
-
-            // start state machine
-            var stateMachine = app.ApplicationServices.GetService<IToiletFlusherStateMachineModel>();
-            stateMachine.StartToiletStateMachine();
         }
 
         private void RegisterCf01Modules(IServiceCollection services)
