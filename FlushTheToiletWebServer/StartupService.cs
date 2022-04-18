@@ -27,7 +27,7 @@ namespace FlushTheToiletWebServer
                 {
                     await _ioBrokerDotNet.ConnectAsync(TimeSpan.FromSeconds(5));
                     var tempCountId = "javascript.0.toilet.flushes.count";
-                    var tempCountResult = _ioBrokerDotNet.GetStateAsync<int>(tempCountId, TimeSpan.FromSeconds(5)).Result;
+                    var tempCountResult = _ioBrokerDotNet.TryGetStateAsync<int>(tempCountId, TimeSpan.FromSeconds(5)).Result;
                     if (tempCountResult.Success)
                     {
                         ioBrokerConnected = true;
@@ -44,7 +44,7 @@ namespace FlushTheToiletWebServer
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }

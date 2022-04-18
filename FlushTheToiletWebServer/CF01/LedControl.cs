@@ -14,15 +14,16 @@ namespace FlushTheToiletWebServer.CF01
         readonly Led mRedLed;
         readonly Led mYellowLed;
         readonly Led mGreenLed;
+        readonly Led mBlueLed;
 
         public LedControl(IGpioController gpio)
         {
             mRedLed = new Led(gpio, PinAssignment.RED_LED);
             mYellowLed = new Led(gpio, PinAssignment.YELLOW_LED);
             mGreenLed = new Led(gpio, PinAssignment.GREEN_LED);
-            TurnAllLedsOn();
-            Thread.Sleep(500);
+            mBlueLed = new Led(gpio, PinAssignment.BLUE_LED);
             TurnAllLedsOff();
+            BlueLedOn();
         }
 
         public void TurnAllLedsOff()
@@ -30,6 +31,7 @@ namespace FlushTheToiletWebServer.CF01
             RedLedOff();
             YellowLedOff();
             GreenLedOff();
+            BlueLedOff();
         }
 
         public void TurnAllLedsOn()
@@ -37,6 +39,17 @@ namespace FlushTheToiletWebServer.CF01
             RedLedOn();
             YellowLedOn();
             GreenLedOn();
+            BlueLedOn();
+        }
+
+        public void BlueLedOn()
+        {
+            mBlueLed.On();
+        }
+
+        public void BlueLedOff()
+        {
+            mBlueLed.Off();
         }
 
         public void RedLedOn()

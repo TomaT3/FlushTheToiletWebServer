@@ -35,6 +35,10 @@ namespace FlushTheToiletWebServer.Controllers
                         mLedControl.GreenLedOn();
                         break;
 
+                    case "blue":
+                        mLedControl.BlueLedOn();
+                        break;
+
                     case "all":
                         mLedControl.TurnAllLedsOn();
                         break;
@@ -70,6 +74,10 @@ namespace FlushTheToiletWebServer.Controllers
 
                     case "green":
                         mLedControl.GreenLedOff();
+                        break;
+
+                    case "blue":
+                        mLedControl.BlueLedOff();
                         break;
 
                     case "all":

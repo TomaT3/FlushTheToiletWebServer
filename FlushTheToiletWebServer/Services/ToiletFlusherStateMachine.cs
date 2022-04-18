@@ -120,21 +120,25 @@ namespace FlushTheToiletWebServer.Services
         private void WaitForMan()
         {
             mLedControl.TurnAllLedsOff();
+            mLedControl.BlueLedOn();
         }
 
         private void ManArrived()
         {
+            mLedControl.BlueLedOff();
             mLedControl.GreenLedOn();
         }
 
         private void ManIsPeeing()
         {
+            mLedControl.BlueLedOff();
             mLedControl.GreenLedOff();
             mLedControl.YellowLedOn();
         }
 
         private void Flush()
         {
+            mLedControl.BlueLedOff();
             mLedControl.GreenLedOff();
             mLedControl.YellowLedOff();
             mLedControl.RedLedOn();
@@ -146,7 +150,7 @@ namespace FlushTheToiletWebServer.Services
         private void ResetTempFlushCount()
         {
             var tempCountId = "javascript.0.toilet.flushes.count";
-            _ioBroker.SetStateAsync<int>(tempCountId, 0);
+            _ioBroker.TrySetStateAsync<int>(tempCountId, 0);
         }
 
         private void SetFlushCountInIoBroker()
@@ -154,19 +158,19 @@ namespace FlushTheToiletWebServer.Services
             try
             {
                 var tempCountId = "javascript.0.toilet.flushes.count";
-                var tempCountResult = _ioBroker.GetStateAsync<int>(tempCountId, TimeSpan.FromSeconds(5)).Result;
+                var tempCountResult = _ioBroker.TryGetStateAsync<int>(tempCountId, TimeSpan.FromSeconds(5)).Result;
                 if (tempCountResult.Success)
                 {
                     var newValue = tempCountResult.Value + 1;
-                    _ioBroker.SetStateAsync<int>(tempCountId, newValue);
+                    _ioBroker.TrySetStateAsync<int>(tempCountId, newValue);
                 }
 
                 var totalCountId = "javascript.0.toilet.flushes.totalcount";
-                var totalCountResult = _ioBroker.GetStateAsync<int>(totalCountId, TimeSpan.FromSeconds(5)).Result;
+                var totalCountResult = _ioBroker.TryGetStateAsync<int>(totalCountId, TimeSpan.FromSeconds(5)).Result;
                 if (totalCountResult.Success)
                 {
                     var newValue = totalCountResult.Value + 1;
-                    _ioBroker.SetStateAsync<int>(totalCountId, newValue);
+                    _ioBroker.TrySetStateAsync<int>(totalCountId, newValue);
                 }
             }
             catch
