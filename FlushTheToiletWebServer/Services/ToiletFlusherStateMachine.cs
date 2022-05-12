@@ -9,6 +9,8 @@ namespace FlushTheToiletWebServer.Services
 {
     public class ToiletFlusherStateMachine : IToiletFlusherStateMachine
     {
+        private const string IOBROKER_MANPEEING_ID = "javascript.0.toilet.someonepeeing";
+
         private readonly IIoBrokerDotNet _ioBroker;
         private PassiveStateMachine<ToiletStates, ToiletEvents> mToiletStateMachine;
         private CurrentStateExtension mCurrentStateExtension;
@@ -121,12 +123,14 @@ namespace FlushTheToiletWebServer.Services
         {
             mLedControl.TurnAllLedsOff();
             mLedControl.BlueLedOn();
+            _ioBroker.TrySetStateAsync<bool>(IOBROKER_MANPEEING_ID, false);
         }
 
         private void ManArrived()
         {
             mLedControl.BlueLedOff();
             mLedControl.GreenLedOn();
+            _ioBroker.TrySetStateAsync<bool>(IOBROKER_MANPEEING_ID, true);
         }
 
         private void ManIsPeeing()
